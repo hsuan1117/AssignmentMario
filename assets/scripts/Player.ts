@@ -31,6 +31,9 @@ export class Player extends Component {
     playerSpeed: number = 300;
 
     @property
+    jumpTime: number = 0;
+
+    @property
     onGround: boolean = false;
 
     onLoad() {
@@ -48,12 +51,6 @@ export class Player extends Component {
         if (collider) {
             collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
             collider.on(Contact2DType.END_CONTACT, this.onEndContact, this);
-        }
-
-        // Registering global contact callback functions
-        if (PhysicsSystem2D.instance) {
-            PhysicsSystem2D.instance.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
-            PhysicsSystem2D.instance.on(Contact2DType.END_CONTACT, this.onEndContact, this);
         }
     }
 
@@ -74,8 +71,9 @@ export class Player extends Component {
     }
 
     jump() {
-        //if (this.moveDirection != MoveDirection.jump || !this.onGround) return;
-        this.node.getComponent(RigidBody2D).linearVelocity = v2(0, 15)
+        if (this.jumpTime > 1) return;
+        this.jumpTime++;
+        this.node.getComponent(RigidBody2D).linearVelocity = v2(0, 6)
     }
 
     onKeyDown(e) {
@@ -95,11 +93,24 @@ export class Player extends Component {
     }
 
     onKeyUp(e) {
-        this.moveDirection = MoveDirection.none;
+        switch (e.keyCode) {
+            case KeyCode.KEY_D:
+            case KeyCode.KEY_A:
+                this.moveDirection = MoveDirection.none;
+                break;
+            case KeyCode.KEY_W:
+            case KeyCode.SPACE:
+                // this.moveDirection = MoveDirection.jump;
+                // this.jump()
+                break;
+        }
     }
 
-    onBeginContact(contact, self, other) {
-        if (other?.tag === 1) {
+    onBeginContact(self, other, contact) {
+        if (other?.tag === 1 || other?.tag === 2) {
+            this.jumpTime = 0;
+            if (this.moveDirection === MoveDirection.jump)
+                this.moveDirection = MoveDirection.none;
             this.onGround = true;
         }
     }
