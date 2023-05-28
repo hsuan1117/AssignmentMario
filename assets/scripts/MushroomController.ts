@@ -5,7 +5,7 @@ import {
     Contact2DType,
     BoxCollider2D,RigidBody2D,
     instantiate,v2,
-    resources,
+    resources,AudioClip,
     Prefab,
     Node
 } from 'cc';
@@ -35,6 +35,9 @@ export class MushroomController extends Component {
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: any) {
         if (otherCollider.node.name == "Mario") {
             console.log(contact.getWorldManifold().normal.y)
+            resources.load("audio/kick", AudioClip, (err, audio) => {
+                audio.play()
+            });
             if (contact.getWorldManifold().normal.y === 1) {
                 setTimeout(()=> {
                     this.node.destroy();

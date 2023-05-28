@@ -10,8 +10,6 @@ import {
     ERigidBody2DType,
     AudioClip,
     Prefab,
-    CircleCollider2D,
-    Node,
     v2
 } from 'cc';
 import {Player} from "db://assets/scripts/Player";
@@ -20,6 +18,9 @@ const {ccclass, property} = _decorator;
 
 @ccclass('QuestionBlockController')
 export class QuestionBlockController extends Component {
+    alltime = 0;
+    lastOffer = -1;
+
     start() {
         // register begin contact callback
         let collider = this.getComponent(Collider2D);
@@ -32,12 +33,31 @@ export class QuestionBlockController extends Component {
     }
 
     update(deltaTime: number) {
-
+        this.alltime += deltaTime;
+        console.log(this.alltime - this.lastOffer)
+        if (this.alltime - this.lastOffer > 1) {
+            console.log('yes')
+            const show = Math.floor((this.alltime*10) % 4 + 1)
+            for (let i = 1; i <= 5; i++) {
+                this.node.getChildByName(`${i}`).active = false
+            }
+            this.node.getChildByName(`${show}`).active = true
+        } else {
+            console.log('no')
+            for (let i = 1; i <= 4; i++) {
+                this.node.getChildByName(`${i}`).active = false
+            }
+            this.node.getChildByName('5').active = true
+        }
     }
 
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: any) {
         if (otherCollider.node.name == "Mario") {
             if (contact.getWorldManifold().normal.y < 0) {
+                if(this.alltime - this.lastOffer < 1) {
+                    return
+                }
+                this.lastOffer = this.alltime
                 // choose mushroom or coin
                 const random = Math.random()
                 if (random < 0.5) {
@@ -57,7 +77,7 @@ export class QuestionBlockController extends Component {
                         coin.getComponent(BoxCollider2D).on(Contact2DType.BEGIN_CONTACT, (self, other, contact) => {
                             if (other.node.name == "MarioMap") {
                                 otherCollider.node.getComponent(Player).coin++
-                                setTimeout(()=>{
+                                setTimeout(() => {
                                     coin.getComponent(BoxCollider2D).enabled = false
                                 }, 100)
                                 resources.load('audio/coin', AudioClip, (err, audio) => {

@@ -33,7 +33,7 @@ export class GameSceneController extends Component {
      * 4: bonus
      * */
     onLoad() {
-        PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.Shape;
+        //PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.Shape;
 
         // traverse all the pixel of the map, generate collider2D for the wall
         let map = this.node.getChildByName('MarioMap').getComponent(TiledMap)
