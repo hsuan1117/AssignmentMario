@@ -905,7 +905,7 @@
     },
     "component": "",
     "_componentId": "0af5diaZIFAPYCG9GRk6giY",
-    "handler": "changeScene",
+    "handler": "changeScene2",
     "customEventData": "level2"
   },
   {

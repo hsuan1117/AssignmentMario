@@ -80,8 +80,12 @@ Here is some example of the correct physics properties
 
 ![camera.gif](.README_images%2Fcamera.gif)
 
-###### At least two different world maps.
-
+###### At least two different world maps
+There are two maps
+1. Level1
+![](.README_images/f0c2d295.png)
+2. Level2
+![img.png](.README_images%2Fimg.png)
 ##### Level Design
 
 ###### The scene should have “Static” wall

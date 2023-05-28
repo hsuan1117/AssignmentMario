@@ -12,8 +12,10 @@ export class LevelSelectSceneController extends Component {
     }
 
     changeScene(evt) {
-        console.log(evt)
         director.loadScene("GameScene");
+    }
+    changeScene2(evt) {
+        director.loadScene("GameScene2");
     }
 }
 
