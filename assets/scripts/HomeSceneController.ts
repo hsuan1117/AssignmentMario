@@ -4,12 +4,22 @@ const {ccclass, property} = _decorator;
 
 @ccclass('HomeSceneController')
 export class HomeSceneController extends Component {
+    isLogin: boolean = false;
+
     start() {
         // play bgm "bgm_1"
         this.node.on("click", () => {
             this.node.getChildByName("bgm_1").getComponent(AudioSource).play();
         })
-        this.node.parent.getChildByName("MainController").getChildByName("alert").active = false;
+        if (this.node.parent.getChildByName("MainController"))
+            this.node.parent.getChildByName("MainController").getChildByName("alert").active = false;
+        // @ts-ignore
+        firebase.auth().onAuthStateChanged((user) => {
+            console.log(user)
+            if (user) {
+                this.isLogin = true;
+            }
+        })
     }
 
     update(deltaTime: number) {
@@ -17,6 +27,11 @@ export class HomeSceneController extends Component {
     }
 
     onSignUpBtnClicked() {
+        if (this.isLogin) {
+            director.loadScene("LevelSelectScene");
+            return;
+        }
+
         this.node.parent.getChildByName("DialogContainerForSignUp").active = true;
     }
 
@@ -25,6 +40,11 @@ export class HomeSceneController extends Component {
     }
 
     onSignInBtnClicked() {
+        if (this.isLogin) {
+            director.loadScene("LevelSelectScene");
+            return;
+        }
+
         this.node.parent.getChildByName("DialogContainerForLogin").active = true;
     }
 
@@ -42,7 +62,7 @@ export class HomeSceneController extends Component {
             const user = userCredential.user;
             console.log(user);
             this.node.parent.getChildByName("DialogContainerForLogin").active = false;
-            director.loadScene("MenuScene");
+            director.loadScene("LevelSelectScene");
         }).catch((error) => {
             this.node.parent.getChildByName("MainContainer").getChildByName("alert").getChildByName("Label").getComponent(Label).string = error.message;
             this.node.parent.getChildByName("DialogContainerForLogin").active = false;
@@ -51,6 +71,11 @@ export class HomeSceneController extends Component {
     }
 
     signUp() {
+        if (this.isLogin) {
+            director.loadScene("LevelSelectScene");
+            return;
+        }
+
         // @ts-ignore
         firebase.auth().createUserWithEmailAndPassword(
             this.node.parent.getChildByName("DialogContainerForSignUp").getChildByName("DialogSignUp").getChildByName("Email").getComponent(EditBox).string,
@@ -60,7 +85,7 @@ export class HomeSceneController extends Component {
             const user = userCredential.user;
             console.log(user);
             this.node.parent.getChildByName("DialogContainerForSignUp").active = false;
-            director.loadScene("MenuScene");
+            director.loadScene("LevelSelectScene");
         }).catch((error) => {
             this.node.parent.getChildByName("MainContainer").getChildByName("alert").getChildByName("Label").getComponent(Label).string = error.message;
             this.node.parent.getChildByName("DialogContainerForSignUp").active = false;
