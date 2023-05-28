@@ -39,6 +39,9 @@ export class Player extends Component {
     jumpTime: number = 0;
 
     @property
+    public score : number = 0;
+
+    @property
     onGround: boolean = false;
 
     @property
@@ -47,17 +50,19 @@ export class Player extends Component {
     @property
     public coin = 0;
 
+    alltime = 0
+
     onLoad() {
         systemEvent.on(SystemEventType.KEY_DOWN, this.onKeyDown, this);
         systemEvent.on(SystemEventType.KEY_UP, this.onKeyUp, this);
 
         // create a label to show x,y
-        const nd = new Node()
-        nd.setPosition(0, 24)
-        const label = nd.addComponent(Label);
-        label.fontSize = 12;
-        label.color = color(0, 0, 0);
-        this.node.addChild(nd)
+        // const nd = new Node()
+        // nd.setPosition(0, 24)
+        // const label = nd.addComponent(Label);
+        // label.fontSize = 12;
+        // label.color = color(0, 0, 0);
+        // this.node.addChild(nd)
     }
 
     onDestroy() {
@@ -74,25 +79,47 @@ export class Player extends Component {
         }
     }
 
+    damage() {
+        this.life--;
+        resources.load('audio/loseOneLife', AudioClip, (err, audio) => {
+            this.node.getComponent(AudioSource).clip = audio;
+            this.node.getComponent(AudioSource).play();
+        })
+    }
+
     playedGameOver = false;
 
     update(deltaTime: number) {
+        this.alltime += deltaTime;
         // scaleX
         this.movePlayer(deltaTime);
         if (this.node.position.y < -320) {
-            this.life--;
-            resources.load('audio/loseOneLife', AudioClip, (err, audio) => {
-                this.node.getComponent(AudioSource).clip = audio;
-                this.node.getComponent(AudioSource).play();
-            })
+            this.damage()
             this.node.setPosition(-280, -280);
         }
 
         // update x,y to the label
-        this.node.getComponentInChildren(Label).string = `x:${this.node.position.x.toFixed(2)}, y:${this.node.position.y.toFixed(2)}`;
+        // this.node.getComponentInChildren(Label).string = `x:${this.node.position.x.toFixed(2)}, y:${this.node.position.y.toFixed(2)}`;
 
         if (this.life <= 0) {
             director.loadScene('LoseScene')
+        }
+        for (let i = 0; i <= 44; i++) {
+            this.node.getChildByName(`mario_big_${i}`).active = false
+        }
+        if (this.moveDirection === MoveDirection.jump) {
+            const show = Math.floor((this.alltime * 10) % 4) + 23
+            this.node.getChildByName(`mario_big_${show}`).active = true
+        } else if (this.moveDirection === MoveDirection.right) {
+            const show = Math.floor((this.alltime * 10) % 3) + 9
+            this.node.getChildByName(`mario_big_${show}`).setScale(1, 1)
+            this.node.getChildByName(`mario_big_${show}`).active = true
+        } else if (this.moveDirection === MoveDirection.left) {
+            const show = Math.floor((this.alltime * 10) % 3) + 9
+            this.node.getChildByName(`mario_big_${show}`).setScale(-1, 1)
+            this.node.getChildByName(`mario_big_${show}`).active = true
+        } else {
+            this.node.getChildByName(`mario_big_9`).active = true
         }
     }
 
@@ -156,11 +183,7 @@ export class Player extends Component {
         }
         if (other?.tag === 3) {
             if (contact.getWorldManifold().normal.y !== 1) {
-                resources.load('audio/loseOneLife', AudioClip, (err, audio) => {
-                    this.node.getComponent(AudioSource).clip = audio;
-                    this.node.getComponent(AudioSource).play();
-                })
-                this.life--;
+                this.damage()
                 other.node.getComponent(RigidBody2D).linearVelocity = v2(1, 0)
                 this.node.setPosition(0, 0);
             }

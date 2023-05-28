@@ -3,11 +3,7 @@ import {
     Component,
     v2, v3,
     BoxCollider2D,
-    PhysicsSystem2D,
-    EPhysics2DDrawFlags,
     TiledMap,
-    RigidBody2D,
-    CircleCollider2D,
     Size,
     Camera,
     Node,
@@ -33,7 +29,7 @@ export class GameSceneController extends Component {
      * 4: bonus
      * */
     onLoad() {
-        //PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.Shape;
+        // PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.Shape;
 
         // traverse all the pixel of the map, generate collider2D for the wall
         let map = this.node.getChildByName('MarioMap').getComponent(TiledMap)
@@ -79,6 +75,13 @@ export class GameSceneController extends Component {
                 resources.load("prefabs/Mushroom", Prefab, (err, prefab) => {
                     const goomba = instantiate(prefab)
                     goomba.setPosition(-480 + obj.x, -320 + obj.y, 0)
+                    this.node.addChild(goomba)
+                });
+                // @ts-ignore
+            } else if (obj?.T === 'flower') {
+                resources.load("prefabs/Flower", Prefab, (err, prefab) => {
+                    const goomba = instantiate(prefab)
+                    goomba.setPosition(-953.5 + obj.x, -640 + obj.y, 0)
                     this.node.addChild(goomba)
                 });
             }
@@ -143,8 +146,10 @@ export class GameSceneController extends Component {
     update(deltaTime: number) {
         this.timer += deltaTime
         const camera = this.node.getComponentInChildren(Camera)
-        if (this.node.getChildByName('Mario'))
+        if (this.node.getChildByName('Mario')) {
             camera.node.setPosition(this.node.getChildByName('Mario').position)
+            this.node.getChildByName("bg").active = false
+        }
 
         const lifeLabel = this.node.getChildByName('Life')
         if (lifeLabel && this.node.getChildByName('Mario')) {
@@ -156,6 +161,12 @@ export class GameSceneController extends Component {
         if (timerLabel && this.node.getChildByName('Mario')) {
             timerLabel.setPosition(camera.node.position.x, camera.node.position.y + 220)
             timerLabel.getComponent(Label).string = 'Timer: ' + this.timer.toFixed(2)
+        }
+
+        const scoreLabel = this.node.getChildByName('Score')
+        if (scoreLabel && this.node.getChildByName('Mario')) {
+            scoreLabel.setPosition(camera.node.position.x, camera.node.position.y + 250)
+            scoreLabel.getComponent(Label).string = 'Score: ' + this.node.getChildByName('Mario').getComponent(Player).score
         }
     }
 }

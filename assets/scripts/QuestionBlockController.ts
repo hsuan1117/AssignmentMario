@@ -34,16 +34,13 @@ export class QuestionBlockController extends Component {
 
     update(deltaTime: number) {
         this.alltime += deltaTime;
-        console.log(this.alltime - this.lastOffer)
         if (this.alltime - this.lastOffer > 1) {
-            console.log('yes')
             const show = Math.floor((this.alltime*10) % 4 + 1)
             for (let i = 1; i <= 5; i++) {
                 this.node.getChildByName(`${i}`).active = false
             }
             this.node.getChildByName(`${show}`).active = true
         } else {
-            console.log('no')
             for (let i = 1; i <= 4; i++) {
                 this.node.getChildByName(`${i}`).active = false
             }

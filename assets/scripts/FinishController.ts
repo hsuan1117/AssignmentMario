@@ -1,5 +1,6 @@
-import { _decorator, Component, Node,BoxCollider2D,Contact2DType,RigidBody2D,v2,director } from 'cc';
-const { ccclass, property } = _decorator;
+import {_decorator, Component, Node, BoxCollider2D, Contact2DType, RigidBody2D, v2, director} from 'cc';
+
+const {ccclass, property} = _decorator;
 
 @ccclass('FinishController')
 export class FinishController extends Component {
@@ -11,7 +12,8 @@ export class FinishController extends Component {
         collider.enabled = true
         if (collider) {
             collider.on(Contact2DType.BEGIN_CONTACT, (self, other, contact) => {
-                director.loadScene('WinScene')
+                if (other.node.name == "Mario")
+                    director.loadScene('WinScene')
             }, this);
         }
     }
